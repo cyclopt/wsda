@@ -5,7 +5,7 @@
   "main": "analysis.js",
   "dependencies": {
     "bluebird": "^3.5.1",
-    "lighthouse": "4.1.0"
+    "lighthouse": "4.2.0"
   },
   "devDependencies": {
     "jest": "^24.5.0",
