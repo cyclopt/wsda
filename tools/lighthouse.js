@@ -1,31 +1,37 @@
 const lighthouse = require('lighthouse');
 const chromeLauncher = require('chrome-launcher');
-const bfj = require('bfj');
-const _ = require('lodash');
 const Promise = require("bluebird");
 
-const opts = {
-  quite: true,
-  chromeFlags: ['--timeout 10000', '--headless']
-};
+Promise.config({cancellation: true});
 
-Promise.config({
-	cancellation: true
-});
+/**
+ * @param {string} url The url of the website
+ * @param {JSON} opts execution options
+ * @param {JSON} config configuration
+ * @returns {promise} The analysis results
+ */
+const launchChromeAndRunLighthouse = function(url, opts, config = null) {
+  const start = new Date();
 
-function launchChromeAndRunLighthouse(storingDir, url, opts, config = null) {
   console.log(url)
+
   return chromeLauncher.launch({chromeFlags: opts.chromeFlags}).then(chrome => {
     console.log('Chrome launched');
+    //console.log(chrome);
+    global.chrome_child_process = chrome;
     opts.port = chrome.port;
+
     return lighthouse(url, opts, config).then(results => {
       console.log('Lighthouse ended');
       // The gathered artifacts are typically removed as they can be quite large (~50MB+)
       delete results.artifacts;
       delete results.report;
+      
       return chrome.kill().then(() => {
         console.log('Chrome killed');
-        return Promise.resolve(results);
+        const elTime = new Date() - start;
+        
+        return Promise.resolve({"lighthouse_results": results, "analysis_duration": elTime + "ms"});
       })
     }).catch(error => {
       return Promise.reject(error);
@@ -34,8 +40,6 @@ function launchChromeAndRunLighthouse(storingDir, url, opts, config = null) {
     return Promise.reject({"LighthouseError": error});
   })
 }
-
-const launchChromeAndRunLighthouseAsync = Promise.promisify(launchChromeAndRunLighthouse);
 
 module.exports = {
   runLighthouse: launchChromeAndRunLighthouse
