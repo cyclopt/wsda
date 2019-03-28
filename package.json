@@ -26,7 +26,7 @@
       "lcov"
     ],
     "collectCoverageFrom": [
-      "**/*.{js}"
+      "**/*.js"
     ],
     "coveragePathIgnorePatterns": [
       "<rootDir>/node_modules/",

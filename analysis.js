@@ -6,7 +6,7 @@ const lighthouse_options = {
   chromeFlags: ['--headless']
 };
 
-const timeout_in_seconds = 2;
+const timeout_in_seconds = 120;
 
 module.exports = {
   runAnalysis: function(url){
